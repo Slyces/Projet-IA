@@ -9,12 +9,17 @@ __date__ = '26/01/2017'
 __email__ = 'simon.lassourreuille@etu.u-bordeaux.fr & antoine.loizel@etu.u-bordeaux.fr'
 __status__ = 'TD'
 # =============================================================================
+import socket
+import threading
+import tkinter as tk
 from cmath import rect
 from math import pi, cos, sqrt
-from Main import *
+
 from PIL import Image, ImageTk
-from random import choice
-import network, socket, tkinter as tk, threading
+
+import network
+from Main import *
+
 
 # =============================================================================
 def load_image(path, resize=None):
@@ -50,11 +55,11 @@ class Game(tk.Tk):
         size = (self.width*2,self.width*2)
         for i in range(3):
             if i > 0:
-                self.__images[i, '_'] = load_image("Hexagon {} _.png".format(i), size)
+                self.__images[i, '_'] = load_image("Sprites/Hexagon {} _.png".format(i), size)
             if i < 2:
-                self.__tokens.append(load_image("Token {}.png".format(i),(self.width,self.width)))
-                self.__victory.append(load_image("Victory {}.png".format(i+1)))
-            self.__images[i] = load_image("Hexagon {}.png".format(i), size)
+                self.__tokens.append(load_image("Sprites/Token {}.png".format(i),(self.width,self.width)))
+                self.__victory.append(load_image("Sprites/Victory {}.png".format(i+1)))
+            self.__images[i] = load_image("Sprites/Hexagon {}.png".format(i), size)
 
         # Bindings
         self.bind('<Button-1>', self.on_click)
@@ -139,7 +144,7 @@ class Game(tk.Tk):
         if self.token == self.player and self.p.jouables([BLANC,NOIR][self.player]):
             cell = self.select(self.p.jouables([BLANC,NOIR][self.player]))
             i,j = self.p.pos2coord(cell.position)
-            network.send_msg(self.socket, "click {} {}".format(i,j))
+            network.send_msg(self.socket, "click {} {}".format(i, j))
         self.check_victory()
         self.after(75, self.random)
 
@@ -189,7 +194,7 @@ class Game(tk.Tk):
         print("Player :", self.player, "Token :", self.token)
         for (i, j), hex in self.__hexagons.items():
             if hex.enter(ev.x, ev.y) and self.p[i, j].estAccessible([BLANC,NOIR][self.player]):
-                network.send_msg(self.socket, "click {} {}".format(i,j))
+                network.send_msg(self.socket, "click {} {}".format(i, j))
 
     # -------------------------------------------------------------------------
     def display(self):
@@ -277,8 +282,8 @@ class Hexagon(object):
         if p.real < width and p.imag < height:
             return True
         # Second : triangle check
-        p0 = 0 + height * 1j;
-        p1 = width + height * 1j;
+        p0 = 0 + height * 1j
+        p1 = width + height * 1j
         p2 = 0 + self.width * 1j
         Area = 0.5 * (-p1.imag * p2.real + p0.imag * (-p1.real + p2.real)
                       + p0.real * (p1.imag - p2.imag) + p1.real * p2.imag)

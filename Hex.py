@@ -9,12 +9,19 @@ __date__ = '26/01/2017'
 __email__ = 'simon.lassourreuille@etu.u-bordeaux.fr & antoine.loizel@etu.u-bordeaux.fr'
 __status__ = 'TD'
 # =============================================================================
+import socket
+import threading
+import tkinter as tk
 from cmath import rect
 from math import pi, cos, sqrt
-from Main import *
+from typing import Callable
+
 from PIL import Image, ImageTk
-from typing import List, Tuple, Union, Callable
-import network, socket, tkinter as tk, threading
+
+import network
+from Main import *
+
+
 # =============================================================================
 def load_image(path: str, resize: Tuple[int,int]=None) -> 'ImageTk.PhotoImage':
     image = Image.open(path)
@@ -49,11 +56,11 @@ class Game(tk.Tk):
         size = (self.width*2,self.width*2)
         for i in range(3):
             if i > 0:
-                self.__images[i, '_'] = load_image("Hexagon {} _.png".format(i), size)
+                self.__images[i, '_'] = load_image("Sprites/Hexagon {} _.png".format(i), size)
             if i < 2:
-                self.__tokens.append(load_image("Token {}.png".format(i),(self.width,self.width)))
-                self.__victory.append(load_image("Victory {}.png".format(i+1)))
-            self.__images[i] = load_image("Hexagon {}.png".format(i), size)
+                self.__tokens.append(load_image("Sprites/Token {}.png".format(i),(self.width,self.width)))
+                self.__victory.append(load_image("Sprites/Victory {}.png".format(i+1)))
+            self.__images[i] = load_image("Sprites/Hexagon {}.png".format(i), size)
 
         # Bindings
         self.bind('<Button-1>', self.on_click)
@@ -170,16 +177,17 @@ class Game(tk.Tk):
         print("Player :", self.player, "Token :", self.token)
         for (i, j), hex in self.__hexagons.items():
             if hex.enter(ev.x, ev.y) and self.p[i, j].estAccessible([BLANC,NOIR][self.player]):
-                network.send_msg(self.socket, "click {} {}".format(i,j))
+                network.send_msg(self.socket, "click {} {}".format(i, j))
 
     # -------------------------------------------------------------------------
-    def display(self, coords = []):
+    def display(self, coords = ()):
         if not coords:
             self.canvas.delete("all")
         else:
             for coord in coords:
                 self.canvas.delete("%s,%s" % coord)
-        if not coords: coords = [self.p.pos2coord(x.position) for x in self.p.configuration]
+        if not coords:
+            coords = [self.p.pos2coord(x.position) for x in self.p.configuration]
         self.canvas.create_image(self.width/2, self.width/1.8, image=self.__tokens[self.token])
         for i,j in coords:
             # i,j = self.p.pos2coord(x.position)
@@ -263,8 +271,8 @@ class Hexagon(object):
         if p.real < width and p.imag < height:
             return True
         # Second : triangle check
-        p0 = 0 + height * 1j;
-        p1 = width + height * 1j;
+        p0 = 0 + height * 1j
+        p1 = width + height * 1j
         p2 = 0 + self.width * 1j
         Area = 0.5 * (-p1.imag * p2.real + p0.imag * (-p1.real + p2.real)
                       + p0.real * (p1.imag - p2.imag) + p1.real * p2.imag)

@@ -54,12 +54,13 @@ __usage__ = "Test pour tp01 virus"
 __version__ = "1.01"
 __update__ = "05.02.17"
 
-
-import sys
 import os
 import random
+import sys
 from numbers import Number
+
 from mmcTools import check_property, has_failure, subtest_readonly
+
 
 class Data(object):
     """ data collector for success/failure """

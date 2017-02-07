@@ -10,8 +10,9 @@ __email__ = 'simon.lassourreuille@etu.u-bordeaux.fr'\
             '& antoine.loizel@etu.u-bordeaux.fr'
 __status__ = 'TD'
 # =============================================================================
-from typing import Tuple, Any, NewType, List, Dict, Set, Union
 from copy import deepcopy
+from typing import Tuple, Any, NewType, List, Dict, Union
+
 Color = NewType('Color', Any)
 Coord = Tuple[int,int]
 # =============================================================================
@@ -238,12 +239,13 @@ if __name__ == "__main__":
     # print("On attend {6: a}", b.voisinage)  # affiche {6: a}
     # print("On attend [ ]", c.voisins)  # affiche [ ]
     # print("On attend { }", c.voisinage)  # affiche { }
-    p = Plateau(5, 7)
-
-    print("=======")
-    print(repr(p[17]))
-    print(p[17].voisins)
-    for cell in p[17].voisins :
-        print(p.pos2coord(cell.position))
-    print(repr(p))
-    print(p)
+    # p = Plateau(5, 7)
+    #
+    # print("=======")
+    # print(repr(p[17]))
+    # print(p[17].voisins)
+    # for cell in p[17].voisins :
+    #     print(p.pos2coord(cell.position))
+    # print(repr(p))
+    # print(p)
+    pass

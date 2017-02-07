@@ -24,10 +24,12 @@ __version__ = "2.1"
 __update__ = "22.11.16"
 
 #------- import --------------
+import copy
 import functools
 import inspect
-import copy
 import sys
+
+
 #-----------------------------
     
 def signature(fonction):

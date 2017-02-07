@@ -9,7 +9,10 @@ __date__ = '31/01/2017'
 __email__ = 'simon.lassourreuille@etu.u-bordeaux.fr'
 __status__ = 'Prototype'
 # =============================================================================
-import asyncio, network
+import asyncio
+
+import network
+
 HOST = ''
 PORT = network.PORT
 clients, replay, nicknames = [], [], {}
