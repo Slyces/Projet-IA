@@ -53,7 +53,7 @@ class Game(tk.Tk):
         self.canvas['width'] = (2 * self.p.largeur + self.p.hauteur // 2) * 1.08 * self.width
 
         # Images init
-        size = (self.width*2,self.width*2)
+        size = (self.width*2, self.width*2)
         for i in range(3):
             if i > 0:
                 self.__images[i, '_'] = load_image("Sprites/Hexagon {} _.png".format(i), size)
@@ -124,7 +124,7 @@ class Game(tk.Tk):
             self.display()
         if len(self.p.libres) > 0:
             self.after(1750, self.check_victory)
-        else :
+        else:
             self.on_game_end()
 
     # -------------------------------------------------------------------------
