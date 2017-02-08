@@ -59,7 +59,7 @@ import random
 import sys
 from numbers import Number
 
-from mmcTools import check_property, has_failure, subtest_readonly
+from tests.mmcTools import check_property, has_failure, subtest_readonly
 
 
 class Data(object):

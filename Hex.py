@@ -19,7 +19,7 @@ from typing import Callable
 from PIL import Image, ImageTk
 
 import network
-from Main import *
+from Virus.Structures import *
 
 
 # =============================================================================

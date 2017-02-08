@@ -10,11 +10,13 @@ __email__ = 'simon.lassourreuille@etu.u-bordeaux.fr'\
             '& antoine.loizel@etu.u-bordeaux.fr'
 __status__ = 'TD'
 # =============================================================================
+import sys
 from copy import deepcopy
-from typing import Tuple, Any, NewType, List, Dict, Union
 
-Color = NewType('Color', Any)
-Coord = Tuple[int,int]
+if sys.version_info > (3, 5):
+    from typing import Tuple, Any, NewType, List, Dict, Union
+    Color = NewType('Color', Any)
+    Coord = Tuple[int, int]
 # =============================================================================
 # Constantes
 BLANC = 0
@@ -30,6 +32,11 @@ class Case(object):
         self.__position = position
         self.__voisinage = {}
         self.__voisins = set()
+
+    # -------------------------------------------------------------------------
+    @staticmethod
+    def reverse(color: 'Color'):
+        return {BLANC: NOIR, NOIR: BLANC, VIDE: VIDE}[color]
 
     # -------------------------------------------------------------------------
     @property
@@ -86,12 +93,8 @@ class Case(object):
     # -------------------------------------------------------------------------
     def force(self, color: 'Color') -> int:
         return 0 if not self.estAccessible(color) else sum(
-            [voisin.valeur == self.__reverse(color)for voisin in self.voisins]
+            [voisin.valeur == Case.reverse(color)for voisin in self.voisins]
         )
-
-    # -------------------------------------------------------------------------
-    def __reverse(self, color: 'Color') -> 'Color':
-        return {BLANC: NOIR, NOIR: BLANC, VIDE: VIDE}[color]
 
     # -------------------------------------------------------------------------
     def __str__(self) -> str:
@@ -124,7 +127,7 @@ class Plateau(object):
                     L = [(1, (-1, 1)), (2, (0, 1)), (7, (-1, 0))]
                 for (k, (i, j)) in L:
                     if 0 <= a + i < h and 0 <= b + j < self.__length(a+i):
-                        self[a,b].voisins = k, self[a+i, b+j]
+                        self[a, b].voisins = k, self[a+i, b+j]
 
     # -------------------------------------------------------------------------
     def __length(self, line_index: int) -> int:
@@ -165,8 +168,8 @@ class Plateau(object):
 
     # -------------------------------------------------------------------------
     def evaluation(self, color: 'Color') -> int:
-        from random import randint
-        return randint(1,35)
+        return sum([x.force for x in self.jouables(color)]) - sum(
+                        [x.force for x in self.jouables(Case.reverse(color))])
 
     # -------------------------------------------------------------------------
     def pos2coord(self, k: int) -> 'Coord':
@@ -188,6 +191,7 @@ class Plateau(object):
         if type(index) is int:
             return self.__cells[index]
         elif type(index) is tuple and len(index) == 2:
+            # noinspection PyArgumentList
             return self.__cells[self.coord2pos(*index)]
 
     # -------------------------------------------------------------------------
@@ -208,44 +212,3 @@ class Plateau(object):
                 s += COULEURS[self[i,j].valeur].center(k, ' ') + ' '*(k+4)
             s += '\n'
         return s
-
-if __name__ == "__main__":
-    # print("Partie 1")
-    # c = Case(23)  # ok équivalent à Case(23, VIDE)
-    # d = Case(1, NOIR)  # ok ça doit marcher
-    # e = Case(2.5, "blanc")  # je ne sais pas ce qui se passe
-    # print(c.valeur)  # affiche la valeur de la constante VIDE
-    # c.valeur = BLANC
-    # print(c.valeur)  # affiche la valeur de la constante BLANC
-    # print(d.valeur)  # affiche la valeur de la constante NOIR
-    # d.valeur = "vert"
-    # print(d.valeur)  # affiche la valeur de la constante NOIR
-    #
-    # print("Partie 2")
-    # a = Case(1)
-    # b = Case(5, NOIR)
-    # c = Case(7)
-    # print("On attend [ ]", a.voisins)  # affiche [ ]
-    # print("On attend { }", a.voisinage)  # affiche { }
-    # print("On attend [ ]", b.voisins)  # affiche [ ]
-    # print("On attend { }", b.voisinage)  # affiche { }
-    # a.voisins = 2, b
-    # print("On attend [ b ]", a.voisins)  # affiche [ b ]
-    # print("On attend {2: b}", a.voisinage)  # affiche {2: b}
-    # print("On attend [ a ]", b.voisins)  # affiche [ a ]
-    # print("On attend {6: a}", b.voisinage)  # affiche {6: a}
-    # b.voisins = 6, c
-    # print("On attend [ a ]", b.voisins)  # affiche [ a ]
-    # print("On attend {6: a}", b.voisinage)  # affiche {6: a}
-    # print("On attend [ ]", c.voisins)  # affiche [ ]
-    # print("On attend { }", c.voisinage)  # affiche { }
-    # p = Plateau(5, 7)
-    #
-    # print("=======")
-    # print(repr(p[17]))
-    # print(p[17].voisins)
-    # for cell in p[17].voisins :
-    #     print(p.pos2coord(cell.position))
-    # print(repr(p))
-    # print(p)
-    pass
