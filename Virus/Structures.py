@@ -11,7 +11,6 @@ __email__ = 'simon.lassourreuille@etu.u-bordeaux.fr'\
 __status__ = 'TD'
 # =============================================================================
 import sys
-from copy import deepcopy
 
 if sys.version_info > (3, 5):
     from typing import Tuple, Any, NewType, List, Dict, Union
@@ -149,7 +148,7 @@ class Plateau(object):
     # -------------------------------------------------------------------------
     @property
     def configuration(self) -> List['Case']:
-        return deepcopy(self.__cells)
+        return self.__cells.copy()
 
     # -------------------------------------------------------------------------
     @property

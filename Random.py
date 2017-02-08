@@ -30,7 +30,7 @@ def load_image(path, resize=None):
 
 # =============================================================================
 class Game(tk.Tk):
-    def __init__(self, p = Plateau(5, 7), online=True):
+    def __init__(self, p = Plateau(13, 9), online=True):
         # Init of tk window
         tk.Tk.__init__(self)
         self.title("You Lost The Game")

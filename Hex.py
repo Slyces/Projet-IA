@@ -31,14 +31,14 @@ def load_image(path: str, resize: Tuple[int,int]=None) -> 'ImageTk.PhotoImage':
 
 # =============================================================================
 class Game(tk.Tk):
-    def __init__(self, p: 'Plateau' = Plateau(11, 11), online: bool=True):
+    def __init__(self, p: 'Plateau' = Plateau(13, 9), online: bool=True):
         # Init of tk window
         tk.Tk.__init__(self)
         self.title("You Lost The Game")
 
         # Attributes
         self.p = p
-        self.width = 30
+        self.width = 40
         self.player = 0
         self.__hexagons = {}
         self.__images = {}
@@ -166,6 +166,7 @@ class Game(tk.Tk):
 
     # -------------------------------------------------------------------------
     def test(self, ev):
+        print('=' * 60)
         x = self.winfo_pointerx() - self.winfo_rootx()
         y = self.winfo_pointery() - self.winfo_rooty()
         for (i, j), hex in self.__hexagons.items():

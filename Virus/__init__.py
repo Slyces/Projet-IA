@@ -11,7 +11,7 @@ __email__ += ' & ' + 'antoine.loizel@etu.u-bordeaux.fr'
 __status__ = 'Prototype'
 # =============================================================================
 import sys
-if sys.version_info > (3.5):
+if sys.version_info > (3, 5):
     from typing import Tuple, Any, NewType
 
     Color = NewType('Color', Any)
