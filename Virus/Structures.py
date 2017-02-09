@@ -106,7 +106,7 @@ class Case(object):
 
 # =============================================================================
 class Plateau(object):
-    def __init__(self, x: int=5, h: int= 5):
+    def __init__(self, h: int= 5,  x: int= 5):
         h = 5 if h%2 == 0 else h
         self.__h = h
         self.__x = x

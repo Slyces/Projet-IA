@@ -12,8 +12,8 @@ __status__ = 'Prototype'
 from Virus.Structures import *
 # =============================================================================
 class Game(Plateau):
-    def __init__(self, *args, **kwargs):
-        Plateau.__init__(self, *args, **kwargs)
+    def __init__(self, height: int= 5, width: int= 5):
+        Plateau.__init__(self, height, width)
         self.player = 0
         self.token = 0
         self.finished = False
@@ -34,12 +34,12 @@ class Game(Plateau):
         """ Plays in position <i,j> as player <color>. Output yields coords """
         color = color if color else self.color
         if self[i,j].estAccessible(color) and self.player == self.token:
+            if out: yield (i, j), self[i,j].valeur
             self[i,j].valeur = color
-            if out: yield i,j
             for voisin in self[i,j].voisins:
                 if voisin.valeur == Case.reverse(color):
+                    if out: yield self.pos2coord(voisin.position), voisin.valeur
                     voisin.valeur = color
-                    if out: yield self.pos2coord(voisin.position)
 
     # -------------------------------------------------------------------------
     def check_state(self):
