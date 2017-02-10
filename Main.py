@@ -10,7 +10,6 @@ __email__ = 'simon.lassourreuille@etu.u-bordeaux.fr'\
             '& antoine.loizel@etu.u-bordeaux.fr'
 __status__ = 'TD'
 # =============================================================================
-from copy import deepcopy
 from typing import Tuple, Any, NewType, List, Dict, Union
 
 Color = NewType('Color', Any)
@@ -146,7 +145,7 @@ class Plateau(object):
     # -------------------------------------------------------------------------
     @property
     def configuration(self) -> List['Case']:
-        return deepcopy(self.__cells)
+        return self.__cells.copy()
 
     # -------------------------------------------------------------------------
     @property

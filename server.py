@@ -10,7 +10,6 @@ __email__ = 'simon.lassourreuille@etu.u-bordeaux.fr'
 __status__ = 'Prototype'
 # =============================================================================
 import asyncio
-
 import network
 
 HOST = ''
@@ -82,6 +81,13 @@ class GameServerProtocol(asyncio.Protocol):
                 game.remove(self)
 
 if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Server for the Virus Hexagonal game')
+    parser.add_argument('--port', default=4242, help='port to be used (default is 4242)')
+    args = parser.parse_args()
+    PORT = args.port
+
     loop = asyncio.get_event_loop()
     # Create server and initialize on the event loop
     coroutine = loop.create_server(GameServerProtocol, host=HOST, port=PORT)

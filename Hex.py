@@ -71,7 +71,7 @@ class Game(tk.Tk):
         # Networking
         if online:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.socket.connect((network.HOST, network.PORT))
+            self.socket.connect((HOST, PORT))
             # self.socket.connect(('92.89.71.131', network.PORT))
             print(" Connected to the server ".center(80, "="))
             thread = threading.Thread(target=self.server_input, daemon=True)
@@ -288,4 +288,13 @@ class Hexagon(object):
 
 
 if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Game client for the Virus Hexagonal game')
+    parser.add_argument('--port', default=4242, help='port to be used (default is 4242)')
+    parser.add_argument('--host', default='127.0.0.1', help='ip to access (default is 127.0.0.1)')
+    args = parser.parse_args()
+    PORT = int(args.port)
+    HOST = args.host
+
     game = Game()
