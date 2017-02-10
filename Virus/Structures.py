@@ -10,7 +10,7 @@ __email__ = 'simon.lassourreuille@etu.u-bordeaux.fr'\
             '& antoine.loizel@etu.u-bordeaux.fr'
 __status__ = 'TD'
 # =============================================================================
-import sys
+import sys, copy
 
 if sys.version_info > (3, 5):
     from typing import Tuple, Any, NewType, List, Dict, Union
@@ -20,7 +20,7 @@ if sys.version_info > (3, 5):
 # Constantes
 BLANC = 0
 NOIR = 1
-VIDE = None
+VIDE = -1
 COULEURS = {BLANC: "O", NOIR: "X", VIDE:"_"}
 # =============================================================================
 class Case(object):
@@ -106,7 +106,7 @@ class Case(object):
 
 # =============================================================================
 class Plateau(object):
-    def __init__(self, h: int= 5,  x: int= 5):
+    def __init__(self, x: int= 5, h: int= 5):
         h = 5 if h%2 == 0 else h
         self.__h = h
         self.__x = x
@@ -117,7 +117,7 @@ class Plateau(object):
             self.__cells.append(Case(k))
 
         for a in range(h):
-            for b in range(self.__length(a)):
+            for b in range(self.length(a)):
                 if a < h // 2:
                     L = [(5, (1, 0)), (3, (1, 1)), (2, (0, 1))]
                 elif a == h//2 :
@@ -125,11 +125,11 @@ class Plateau(object):
                 else :
                     L = [(1, (-1, 1)), (2, (0, 1)), (7, (-1, 0))]
                 for (k, (i, j)) in L:
-                    if 0 <= a + i < h and 0 <= b + j < self.__length(a+i):
+                    if 0 <= a + i < h and 0 <= b + j < self.length(a+i):
                         self[a, b].voisins = k, self[a+i, b+j]
 
     # -------------------------------------------------------------------------
-    def __length(self, line_index: int) -> int:
+    def length(self, line_index: int) -> int:
         " Returns the length of the n'th line "
         h, x = self.hauteur, self.largeur
         return x + line_index if line_index <= h // 2 \
@@ -148,7 +148,7 @@ class Plateau(object):
     # -------------------------------------------------------------------------
     @property
     def configuration(self) -> List['Case']:
-        return self.__cells.copy()
+        return [copy.copy(x) for x in self.__cells]
 
     # -------------------------------------------------------------------------
     @property
@@ -186,6 +186,14 @@ class Plateau(object):
         return sum([x + k if k <= l else x + l - k%l for k in range(i)]) + j
 
     # -------------------------------------------------------------------------
+    def load(self, iterable) -> 'Plateau':
+        if len(iterable) != len(self): return
+        for x in iterable:
+            if x not in COULEURS.keys(): return
+        for i,x in enumerate(iterable):
+            self[i].valeur = x
+
+    # -------------------------------------------------------------------------
     def __getitem__(self, index: Union['Coord', int]) -> 'Case':
         if type(index) is int:
             return self.__cells[index]
@@ -207,7 +215,14 @@ class Plateau(object):
         s = ''
         for i in range(self.hauteur):
             s += abs(i - self.hauteur // 2) * ' '*(k+2)
-            for j in range(self.__length(i)):
+            for j in range(self.length(i)):
                 s += COULEURS[self[i,j].valeur].center(k, ' ') + ' '*(k+4)
             s += '\n'
         return s
+
+if __name__ == '__main__':
+    p = Plateau()
+    l = [0 for x in range(len(p))]
+    print(l)
+    k = p.load(l)
+    print([x.valeur for x in p.configuration])

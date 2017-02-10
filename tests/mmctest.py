@@ -1,9 +1,12 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# $Id: test_tp01.py,v 2.0 2017/02/05 20:21:21 mmc Exp $
+# $Id: test_tp01.py,v 2.1 2017/02/07 21:01:27 mmc Exp $
 #
 # $Log: test_tp01.py,v $
+# Revision 2.1  2017/02/07 21:01:27  mmc
+# Ajout de tests pour Plateau.load
+#
 # Revision 2.0  2017/02/05 20:21:21  mmc
 # jouablesTriees ::DONE:: 984
 #
@@ -52,15 +55,14 @@ __author__ = "mmc <marc-michel dot corsini at u-bordeaux dot fr>"
 __date__ = "22.01.17"
 __usage__ = "Test pour tp01 virus"
 __version__ = "1.01"
-__update__ = "05.02.17"
+__update__ = "07.02.17"
 
+
+import sys
 import os
 import random
-import sys
 from numbers import Number
-
-from tests.mmcTools import check_property, has_failure, subtest_readonly
-
+from mmcTools import check_property, has_failure, subtest_readonly
 
 class Data(object):
     """ data collector for success/failure """
@@ -727,6 +729,83 @@ def subtest_Plateau_evaluation():
                               "".format(p.evaluation(pion)))
     return _out
 
+def subtest_Plateau_load():
+    """ load permet de modifier le plateau dans sa globalité """
+    import random
+    def check_eq(a,b): return all([x.valeur == y for x,y in zip(a,b)])
+
+    _out = ''
+    p = tp.Plateau()
+    _out = subtest_Plateau_configuration()
+    if has_failure(_out,len(_out)): return _out
+    _fake = [tp.VIDE, tp.NOIR, tp.BLANC]*(len(p)//3)
+    h = len(p) - len(_fake)
+    _fake.extend([tp.NOIR,tp.BLANC][:h])
+    _out += check_property(len(p) == len(_fake))
+    try:
+        r = p.load(_fake)
+        _out += check_property(r is None,
+                               "None expected found {}".format(type(r)))
+    except Exception as _e:
+        print(_e)
+        _out += 'E'
+        return _out
+    _out += check_property(check_eq(p.configuration, _fake),
+                            "load({})".format(type(_fake)), '1')
+    random.shuffle(_fake)
+    try:
+        r = p.load(tuple(_fake))
+        _out += check_property(r is None,
+                               "None expected found {}".format(type(r)))
+    except Exception as _e:
+        print(_e)
+        _out += 'E'
+        return _out
+    _out += check_property(check_eq(p.configuration, _fake),
+                            "load({})".format(tuple), '2')
+    random.shuffle(_fake)
+    try:
+        _dico = {i: x for i,x in enumerate(_fake)}
+        r = p.load(_dico.values())
+        _out += check_property(r is None,
+                               "None expected found {}".format(type(r)))
+    except Exception as _e:
+        print(_e)
+        _out += 'E'
+        return _out
+    _out += check_property(check_eq(p.configuration, _fake),
+                            "load({})".format(type(_dico.values())), '3')
+
+    random.shuffle(_fake)
+    try:
+        _str = ' '.join([str(x) for x in _fake])
+        _old = [x.valeur for x in p.configuration]
+        r = p.load(_str)
+        _out += check_property(r is None,
+                               "None expected found {}".format(type(r)))
+    except Exception as _e:
+        print(_e)
+        _out += 'E'
+        return _out
+    _out += check_property(check_eq(p.configuration, _old),
+                            "load({})".format(type(_str)), '4')
+
+    
+    _str = [tp.COULEURS[x] for x in _fake]
+    try:
+        _old = [x.valeur for x in p.configuration]
+        r = p.load(_str)
+        _out += check_property(r is None,
+                               "None expected found {}".format(type(r)))
+    except Exception as _e:
+        print(_e)
+        _out += 'E'
+        return _out
+    _out += check_property(check_eq(p.configuration, _old),
+                            "load({})".format(type(_str)), '5')
+
+    return _out
+
 def test_Plateau_init(klass, coll):
     """ vérification du constructeur """
     out =''
@@ -765,7 +844,7 @@ def test_Plateau(collecteur):
     test_it = []
     lattr = "__str__ __repr__ __len__ __getitem__ largeur hauteur"
     lattr += " pos2coord coord2pos configuration libres jouables"
-    lattr += " jouablesTriees evaluation"
+    lattr += " jouablesTriees evaluation load"
     lattr = lattr.split()
     badQte, badValues = check_validity('Plateau', plateau(3,5), lattr)
     if badQte > 0:
@@ -872,6 +951,6 @@ if __name__ == '__main__' :
     print("global {res.sum} success {res.yes} fault {res.no}"
           "".format(res=c),end=' ')
     if c.sum != 0 : print("rate: {}%".format(round(100*c.yes/c.sum,2)))
-    print("optimum: 984")
+    print("optimum: 1001")
     
     for k in c.report: print(c.report[k])

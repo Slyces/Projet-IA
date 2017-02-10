@@ -21,7 +21,7 @@ from Virus.Structures import VIDE, BLANC, NOIR
 # Try PIL imports
 pil = True
 try:
-    import PIL
+    from PIL import Image, ImageTk
 except ImportError:
     pil = False
 # =============================================================================
@@ -43,13 +43,14 @@ def create_complex(create):
 
     return decorator
 
+
 # =============================================================================
 if pil:
-    def load_image(path: str, resize):
-        image = PIL.Image.open(path)
+    def load_image(path: str, resize =None):
+        image = Image.open(path)
         if resize:
-            image.thumbnail(resize, PIL.Image.ANTIALIAS)
-        return PIL.ImageTk.PhotoImage(image)
+            image.thumbnail(resize, Image.ANTIALIAS)
+        return ImageTk.PhotoImage(image)
 
 # =============================================================================
 # PIL available
@@ -60,23 +61,23 @@ class HexagonalCanvas(tk.Canvas):
         self.create_polygon = create_complex(self.create_polygon)
         self.board_height = height
         self.hexagon_width = hexwidth//2
-        self.__hexagons = {}
+        self.hexagons_dict = {}
 
     # -------------------------------------------------------------------------
     def coord2pixels(self, coords, origin: complex = None):
         origin = origin if origin else ((self.board_height // 2) * 2 *
-                                self.hexagon_width) * 1J + self.hexagon_width
+                            self.hexagon_width + 5) * 1J + self.hexagon_width
         v = [cmath.rect(self.hexagon_width, math.pi / 6 + i * (math.pi / 3))
                                                              for i in range(6)]
         k = v[-1] + v[-2] if (coords[0] - self.board_height // 2) <= 0 else\
                                                                     v[0] + v[1]
         p = origin + coords[1] * (v[0] + v[-1]) + abs(coords[0] -
                                                    self.board_height // 2) * k
-        return p.real, p.imag
+        return int(p.real), int(p.imag)
     # -------------------------------------------------------------------------
     def hexagon(self, x, y):
         """ Returns the hexagon in position < x ; y > """
-        for (i,j),hex in self.__hexagons.items():
+        for (i,j),hex in self.hexagons_dict.items():
             if hex.enter(x, y):
                 return i,j
     # -------------------------------------------------------------------------
@@ -100,7 +101,7 @@ class withoutPIL(HexagonalCanvas):
     # -------------------------------------------------------------------------
     def display_hexagon(self, i, j, color):
         x, y = [int(k) for k in self.coord2pixels((i, j))]
-        self.__hexagons[i, j] = Hexagon(self.hexagon_width, x, y)
+        self.hexagons_dict[i, j] = Hexagon(self.hexagon_width, x, y)
         self.create_hexagon(x, y, fill=self.colors[color], width= 3,
                             outlines=self.outlines[color], activewidth=6,
                             activeoutline='black', tag='%s,%s' % (i,j))
@@ -112,17 +113,19 @@ if pil:
                      **kwargs):
             HexagonalCanvas.__init__(self, master, height, hexwidth, **kwargs)
             path = path if path else "..\\Sprites\\"
-            self.hexagons = []
+            self.hexagonsImg = []
             for i in range(3):
-                self.hexagons.append(load_image(path + "Hexagons %s" % i,
-                                                               (width, width)))
-            self.active = load_image(path + "Hexagon 0 active", (width, width))
+                self.hexagonsImg.append(load_image(path + "Hexagon %s.png" % i,
+                                                        (hexwidth, hexwidth)))
+            # self.active = load_image(path + "Hexagon 0 active.png",
+            #                                              (hexwidth, hexwidth))
 
         # ---------------------------------------------------------------------
         def display_hexagon(self, i, j, color):
-            x,y = [int(k) for k in self.coord2pixels((i,j))]
-            self.__hexagons[i,j] = Hexagon(self.hexagon_width, x, y)
-            self.create_image(x, y, image=self.hexagons[index(color)])
+            x,y =  self.coord2pixels((i,j))
+            self.hexagons_dict[i,j] = Hexagon(self.hexagon_width, x, y)
+            self.create_image(x, y, image=self.hexagonsImg[index(color)],
+                              tag='%s,%s' % (i,j))
 
 if pil :
     HexCanvas = withPIL
