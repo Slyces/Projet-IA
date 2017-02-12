@@ -13,9 +13,8 @@ __status__ = 'Prototype'
 from Interface.Graphic import *
 from Virus.GameLogic import *
 
-
 # =============================================================================
-class TheGame(Game, tk.Tk):
+class GameBase(Game, tk.Tk):
     def __init__(self, height: int= 5, length: int= 7, width: int=64,
                  path: str='Sprites\\', local: bool=True):
         tk.Tk.__init__(self)
@@ -29,26 +28,17 @@ class TheGame(Game, tk.Tk):
         # Creating the banner
         self._ = {} # Widgets
         self._[0] = self
-        if pil:  # Creating a banner if pil is available
-            self._[1] = tk.Frame(self)
+        self._[1] = tk.Frame(self)
         # Principal gamespace, using a custom Canvas
-        self._[2] = HexCanvas(self, height, width, path=path, relief="sunken")
+        self._[2] = (CanvasWithPIL if pil else CanvasWithoutPIL)(self,
+                                   height, width, path=path, relief="sunken")
         self._[2].pack(fill='both', expand=True)
         self._[2]['height'] = self.width * self.hauteur * 0.82
         self._[2]['width'] = self.width * self.largeur * 1.12
 
-        # Loading pil images
-        if pil:
-            self.images = {}
-            for i in range(2):
-                self.images['Victory', i] = load_image(path +
-                                                       "Victory %s.png" % (i+1))
-                self.images['Token', i] = load_image(path + "Token %s.png" % i,
-                                                        (width*0.8,width*0.8))
-
         # Binding events
-        self.bind('<Button-1>', self.left_click)
-        self.bind('<Button-3>', self.right_click)
+        self.bind('<Button-1>', self.on_click)
+        self.bind('<Button-3>', self.on_click)
         self.bind('<Key>', self.replay)
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
@@ -72,25 +62,11 @@ class TheGame(Game, tk.Tk):
         color = color if color else self.color
         try: i,j = self._[2].hexagon(ev.x,ev.y)
         except: return
-        for (i,j),_from in self.play(i, j, color=color, out=True, player=index(color)-1):
+        for (i,j),_from in self.play(i, j, out=True, color=color):
             self.display(i, j, color,_from)
             self.token = 0 if index(color)-1 else 1
             self.player_token()
         #@TODO : Vérifier que les coordonnés sont dans la bonne base (0-0 à l'angle du canvas, et pas de la fenêtre
-
-    # -------------------------------------------------------------------------
-    def right_click(self, ev):
-        if self.local:
-            return self.on_click(ev, color= ROUGE)
-        else:
-            return self.on_click(ev)
-
-    # -------------------------------------------------------------------------
-    def left_click(self, ev):
-        if self.local:
-            return self.on_click(ev, color=BLEU)
-        else:
-            return self.on_click(ev)
 
     # -------------------------------------------------------------------------
     def on_closing(self):
@@ -104,9 +80,9 @@ class TheGame(Game, tk.Tk):
 
     # -------------------------------------------------------------------------
     def player_token(self):
+        # PIL dependant
         self._[2].delete('token')
-        self._[2].create_image(self.width / 2.2, self.width / 2,
-                            image=self.images['Token', self.token],tag='token')
+        pass
 
     # -------------------------------------------------------------------------
     def check_state(self):
@@ -133,6 +109,43 @@ class TheGame(Game, tk.Tk):
     def display(self, i, j, color, _from=None):
         self._[2].delete("%s,%s" % (i, j))
         self._[2].display_hexagon(i, j, color)
+
+# =============================================================================
+class ThePilGame(GameBase):
+    def __init__(self, height: int = 5, length: int = 7, width: int = 64,
+                 path: str = 'Sprites\\', local: bool = True):
+        GameBase.__init__(self, height, length, width, path, local)
+        self.images = {}
+        for i in range(2):
+            self.images['Victory', i] = load_image(path +
+                                                   "Victory %s.png" % (i + 1))
+            self.images['Token', i] = load_image(path + "Token %s.png" % i,
+                                                    (width * 0.8, width * 0.8))
+
+    # -------------------------------------------------------------------------
+    def player_token(self):
+        self._[2].create_image(self.width / 2.2, self.width / 2,
+                           image=self.images['Token', self.token], tag='token')
+
+# =============================================================================
+class TheNotPilGame(GameBase):
+    def __init__(self, height: int = 5, length: int = 7, width: int = 64,
+                 path: str = 'Sprites\\', local: bool = True):
+        GameBase.__init__(self, height, length, width, path, local)
+
+    # -------------------------------------------------------------------------
+    def player_token(self):
+        self._[2].create_oval(2,2,self.width*0.65+2, self.width*0.65+2,
+                          fill=self._[2].colors[self.tokenColor],tag = 'token')
+
+# =============================================================================
+
+# =============================================================================
+class TheGame(ThePilGame if pil else TheNotPilGame):
+    def __init__(self, height: int= 5, length: int= 7, width: int=64,
+                 path: str='Sprites\\', local: bool=True):
+        (ThePilGame if pil else TheNotPilGame).__init__(self, height, length,
+                                                        width, path, local)
 
 if __name__ == '__main__':
     G = TheGame()

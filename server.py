@@ -11,7 +11,7 @@ __status__ = 'Prototype'
 # =============================================================================
 import asyncio
 
-import network
+from Network import network
 
 HOST = ''
 PORT = network.PORT

@@ -17,7 +17,7 @@ from math import pi, cos, sqrt
 
 from PIL import Image, ImageTk
 
-import network
+from Network import network
 from Virus.Structures import *
 
 

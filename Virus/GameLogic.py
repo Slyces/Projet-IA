@@ -27,6 +27,11 @@ class Game(Plateau):
         return [BLANC, NOIR][self.player]
 
     # -------------------------------------------------------------------------
+    @property
+    def tokenColor(self):
+        return [BLANC, NOIR][self.token]
+
+    # -------------------------------------------------------------------------
     def initialize(self):
         self.player, self.token = 0, 0
         Plateau.__init__(self, self.largeur, self.hauteur)
@@ -51,8 +56,13 @@ class Game(Plateau):
                         yield self.pos2coord(voisin.position), voisin.valeur
                     voisin.valeur = color
             self.check_state()
+            self.change_player()
 
     # -------------------------------------------------------------------------
     def check_state(self):
         # To be overriden
         pass
+
+    # -------------------------------------------------------------------------
+    def change_player(self):
+        self.player = 0 if self.player else 1

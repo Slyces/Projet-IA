@@ -18,7 +18,7 @@ from typing import Callable
 
 from PIL import Image, ImageTk
 
-import network
+from Network import network
 from Virus.Structures import *
 
 
