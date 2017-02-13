@@ -86,24 +86,47 @@ class CanvasWithoutPIL(HexagonalCanvas):
     def __init__(self, master, height: int, hexwidth: int, **kwargs):
         HexagonalCanvas.__init__(self, master, height, hexwidth, **kwargs)
         self.colors = {VIDE: '#C0C0C0', BLEU: '#3D59AB', ROUGE: '#B22222'}
-        self.outlines = {VIDE: '#C0C0C0', BLEU: '#191970', ROUGE: '#800000'}
+        self.outlines = {VIDE: '#000000', BLEU: '#191970', ROUGE: '#800000'}
+        self.nmax = 100
 
     # -------------------------------------------------------------------------
     @create_complex
-    def create_hexagon(self, x, y=None, hexwidth: int= 20, **kwargs):
+    def create_hexagon(self, x, y=None, hexwidth: (int, tuple)= 20, **kwargs):
+        if type(x) is complex : x,y = x.real, y.imag
+        if isinstance(hexwidth, (int, float)): hexwidth = [hexwidth for i in range(6)]
         points = []
         for i in range(6):
-            points.append(x+y*1j+cmath.rect(hexwidth*0.9, math.pi/6+i*(math.pi / 3)))
+            points.append(x+y*1j+cmath.rect(hexwidth[i], math.pi/6+i*(math.pi / 3)))
         return self.create_polygon(*points,**kwargs)
 
     # -------------------------------------------------------------------------
     def display_hexagon(self, i, j, color):
+        if (i,j) in self.hexagons_dict: self.hexagons_dict.pop((i,j))
         x, y = [int(k) for k in self.coord2pixels((i, j))]
         self.hexagons_dict[i, j] = Hexagon(self.hexagon_width, x, y)
-        self.create_hexagon(x, y, fill=self.colors[color], width= 3 if color != VIDE else 0,
+        self.create_hexagon(x, y, fill=self.colors[color], width= 3,
                             outline= self.outlines[color],
-                             activewidth=3, hexwidth=self.hexagon_width,
+                             activewidth=3, hexwidth=self.hexagon_width*0.9,
                             activeoutline='black', tag='%s,%s' % (i,j))
+
+    # -------------------------------------------------------------------------
+    def animate(self, i, j, color, _from=None, n=None):
+        _from = VIDE if _from is None else _from
+        self.delete('%s,%s' % (i,j))
+        n = self.nmax if n is None else n
+        ocolor = color
+        color = color if n < 0 else _from
+        x, y = self.coord2pixels((i, j))
+        self.hexagons_dict[i, j] = Hexagon(self.hexagon_width, x, y)
+        widths = [self.hexagon_width *0.9 if i in (1,4) else
+                          self.hexagon_width*(abs(n)/self.nmax)*0.9 for i in range(6)]
+        self.create_hexagon(x, y, fill=self.colors[color], width=3 if color != VIDE else 0,
+                            outline=self.outlines[color],
+                            activewidth=3, hexwidth= widths,
+                            activeoutline='black', tag='%s,%s' % (i, j))
+        n -= 1
+        if n > -self.nmax:
+            self.master.after(4, lambda args=(i, j, ocolor, _from, n): self.animate(*args))
 
 # ============================================================================
 class CanvasWithPIL(HexagonalCanvas):

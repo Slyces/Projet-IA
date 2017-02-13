@@ -54,17 +54,17 @@ class Case(object):
 
     # -------------------------------------------------------------------------
     @property
-    def voisinage(self) -> Dict['Coord','Case']:
+    def voisinage(self)-> dict:
         return dict(self.__voisinage)
 
     # -------------------------------------------------------------------------
     @property
-    def voisins(self) -> List['Case']:
+    def voisins(self) -> list:
         return list(self.__voisins)
 
     # -------------------------------------------------------------------------
     @voisins.setter
-    def voisins(self, arg: Tuple[int, 'Case']) -> None:
+    def voisins(self, arg: tuple) -> None:
         if type(arg) is tuple and len(arg) == 2:
             index, cell = arg
             if type(index) is int and index >= 0 and type(cell) is Case \
@@ -147,20 +147,20 @@ class Plateau(object):
 
     # -------------------------------------------------------------------------
     @property
-    def configuration(self) -> List['Case']:
+    def configuration(self) -> list:
         return [copy.copy(x) for x in self.__cells]
 
     # -------------------------------------------------------------------------
     @property
-    def libres(self) -> List['Case']:
+    def libres(self) -> list:
         return list(filter(lambda x: x.estLibre, self.configuration))
 
     # -------------------------------------------------------------------------
-    def jouables(self, color: 'Color') -> List['Case']:
+    def jouables(self, color: 'Color') -> list:
         return list(filter(lambda x: x.estAccessible(color),self.configuration))
 
     # -------------------------------------------------------------------------
-    def jouablesTriees(self, color: 'Color') -> List['Case']:
+    def jouablesTriees(self, color: 'Color') -> list:
         jouables = self.jouables(color)
         jouables.sort(key = lambda x: x.force(color), reverse=True)
         return jouables
@@ -194,7 +194,7 @@ class Plateau(object):
             self[i].valeur = x
 
     # -------------------------------------------------------------------------
-    def __getitem__(self, index: Union['Coord', int]) -> 'Case':
+    def __getitem__(self, index: (tuple,int)) -> 'Case':
         if type(index) is int:
             return self.__cells[index]
         elif type(index) is tuple and len(index) == 2:

@@ -62,7 +62,7 @@ class GameBase(Game, tk.Tk):
     def play(self, i, j, color=None, **kwargs):
         color = color if color else self.color
         for (i,j),_from in super().play(i, j, out=True, color=color):
-            self.display(i, j, color,_from)
+            self.display(i, j, color, _from)
             self.token = 0 if index(color)-1 else 1
             self.player_token()
         #@TODO : Vérifier que les coordonnés sont dans la bonne base (0-0 à l'angle du canvas, et pas de la fenêtre
@@ -106,8 +106,9 @@ class GameBase(Game, tk.Tk):
 
     # -------------------------------------------------------------------------
     def display(self, i, j, color, _from=None):
+        _from = color if _from is None else _from
         self._[2].delete("%s,%s" % (i, j))
-        self._[2].display_hexagon(i, j, color)
+        self._[2].display_hexagon(i, j, color, _from)
 
 # =============================================================================
 class ThePilGame(GameBase):
@@ -124,8 +125,6 @@ class ThePilGame(GameBase):
         self.reset()
         # Run
         self.mainloop()
-
-    # -------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------
     def player_token(self):
@@ -164,6 +163,13 @@ class TheNotPilGame(GameBase):
                                    outline="#4E4E4E", width=8, fill="#C7C7C7")
         self._[2].create_text(0.5*w_x, 0.5*w_y, font=("Times", 26, "bold"),
                               text="Bleu {} - {} Rouge".format(*scores))
+
+    # -------------------------------------------------------------------------
+    def display(self, i, j, color, _from=None):
+        print("called")
+        _from = color if _from is None else _from
+        self._[2].delete("%s,%s" % (i, j))
+        self._[2].animate(i, j, color, _from)
 
 # =============================================================================
 
