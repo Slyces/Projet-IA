@@ -108,7 +108,7 @@ class GameBase(Game, tk.Tk):
     def display(self, i, j, color, _from=None):
         _from = color if _from is None else _from
         self._[2].delete("%s,%s" % (i, j))
-        self._[2].display_hexagon(i, j, color, _from)
+        self._[2].display_hexagon(i, j, color)
 
 # =============================================================================
 class ThePilGame(GameBase):

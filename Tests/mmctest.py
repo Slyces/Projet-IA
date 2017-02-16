@@ -922,7 +922,7 @@ if __name__ == '__main__' :
         if not os.path.isfile(param): ValueError("need a python file")
     else: param = sys.argv[1]
 
-    etudiant = param.split('.')[0]
+    etudiant = param.split('.py')[0]
     c = Data()
 
     out = check_property(etudiant != '','acces au fichier')

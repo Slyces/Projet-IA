@@ -187,11 +187,12 @@ class Plateau(object):
 
     # -------------------------------------------------------------------------
     def load(self, iterable) -> 'Plateau':
-        if len(iterable) != len(self): return
+        if False in [hasattr(iterable, attr) for attr in ('__len__','__iter__')]: return
         for x in iterable:
             if x not in COULEURS.keys(): return
         for i,x in enumerate(iterable):
             self[i].valeur = x
+            if i >= len(self): return
 
     # -------------------------------------------------------------------------
     def __getitem__(self, index: (tuple,int)) -> 'Case':
@@ -216,7 +217,7 @@ class Plateau(object):
         for i in range(self.hauteur):
             s += abs(i - self.hauteur // 2) * ' '*(k+2)
             for j in range(self.length(i)):
-                s += COULEURS[self[i,j].valeur].center(k, ' ') + ' '*(k+4)
+                s += str(self[i,j]).center(k, ' ') + ' '*(k+4)
             s += '\n'
         return s
 
@@ -226,3 +227,5 @@ if __name__ == '__main__':
     print(l)
     k = p.load(l)
     print([x.valeur for x in p.configuration])
+
+    print(p)

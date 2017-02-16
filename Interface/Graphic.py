@@ -124,6 +124,7 @@ class CanvasWithoutPIL(HexagonalCanvas):
                             outline=self.outlines[color],
                             activewidth=3, hexwidth= widths,
                             activeoutline='black', tag='%s,%s' % (i, j))
+        self.tag_lower('%s,%s' % (i,j))
         n -= 1
         if n > -self.nmax:
             self.master.after(4, lambda args=(i, j, ocolor, _from, n): self.animate(*args))
