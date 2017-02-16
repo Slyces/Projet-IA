@@ -100,8 +100,8 @@ class Case(object):
         return COULEURS[self.valeur]
 
     def __repr__(self) -> str:
-        return "Case en position {i} et de contenu {c}".format(
-            i=self.position, c=self.valeur
+        return "Case({i},{c})".format(
+            i=self.position, c={BLANC:'BLANC', NOIR:'NOIR', VIDE: 'VIDE'}[self.valeur]
         )
 
 # =============================================================================
@@ -187,11 +187,17 @@ class Plateau(object):
 
     # -------------------------------------------------------------------------
     def load(self, iterable) -> 'Plateau':
-        if len(iterable) != len(self): return
+        # print("Load !!!", iterable)
+        if False in [hasattr(iterable, req) for req in ('__len__','__iter__')]:
+            # print('False, return !')
+            return
         for x in iterable:
-            if x not in COULEURS.keys(): return
+            if x not in COULEURS.keys():
+                # print('Problem: return !', x, COULEURS.keys())
+                return
         for i,x in enumerate(iterable):
             self[i].valeur = x
+            if i >= len(self): return
 
     # -------------------------------------------------------------------------
     def __getitem__(self, index: Union['Coord', int]) -> 'Case':
